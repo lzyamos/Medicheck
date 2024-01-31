@@ -7,11 +7,13 @@ from .models import Record
 
 def home(request):
 	records = Record.objects.all()
-	# Check to see if logging in
+	
+ # Check to see if logging in
 	if request.method == 'POST':
 		username = request.POST['username']
 		password = request.POST['password']
-		# Authenticate
+		
+  # Authenticate
 		user = authenticate(request, username=username, password=password)
 		if user is not None:
 			login(request, user)

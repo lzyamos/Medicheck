@@ -45,3 +45,12 @@ class AddRecordForm(forms.ModelForm):
 	class Meta:
 		model = Record
 		exclude = ("user",)
+  
+class SymptomAnalyzerForm(forms.Form):
+    symptom = forms.ChoiceField(choices=[], widget=forms.Select(attrs={'class': 'form-control'}), label="Select a Symptom")
+    severity = forms.IntegerField(min_value=1, max_value=10, widget=forms.NumberInput(attrs={'class': 'form-control'}), label="Severity")
+
+    def __init__(self, *args, **kwargs):
+        symptoms_choices = kwargs.pop('symptoms_choices', [])
+        super(SymptomAnalyzerForm, self).__init__(*args, **kwargs)
+        self.fields['symptom'].choices = symptoms_choices

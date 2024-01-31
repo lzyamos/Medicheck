@@ -1,30 +1,29 @@
 from django.db import models
-
-class Record(models.Model):
-	created_at = models.DateTimeField(auto_now_add=True)
-	first_name = models.CharField(max_length=50)
-	last_name =  models.CharField(max_length=50)
-	email =  models.CharField(max_length=100)
-	phone = models.CharField(max_length=15)
-	
-
-	def __str__(self):
-		return(f"{self.first_name} {self.last_name}")
-
 class User(models.Model):
     UserID = models.AutoField(primary_key=True)
-    Username = models.CharField(max_length=50)
+    Username = models.CharField(max_length=50, unique=True)
     Password = models.CharField(max_length=100)
-    Email = models.CharField(max_length=100)
+    Email = models.CharField(max_length=100, unique=True)
     FirstName = models.CharField(max_length=50)
     LastName = models.CharField(max_length=50)
     RegistrationDate = models.DateTimeField(auto_now_add=True)
     Created_at = models.DateTimeField(auto_now_add=True)
-    Phone = models.CharField(max_length=15)
+    Phone = models.CharField(max_length=15, null=True, blank=True)
 
     def __str__(self):
         return self.Username
+class Record(models.Model):
+    RecordID = models.AutoField(primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    first_name = models.CharField(max_length=50)
+    last_name =  models.CharField(max_length=50)
+    email =  models.CharField(max_length=100)
+    phone = models.CharField(max_length=15, default="2457000000000")
+	
 
+    def __str__(self):
+	    return(f"{self.first_name} {self.last_name}")
+ 
 class Symptom(models.Model):
     SymptomID = models.AutoField(primary_key=True)
     SymptomName = models.CharField(max_length=100)
@@ -97,6 +96,29 @@ class SymptomManager(models.Manager):
             return "User not found"
         except Symptom.DoesNotExist:
             return "Symptom not found"
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            return "An unexpected error occurred. Please try again or contact support."
+        
+class ConditionManager(models.Manager):
+    def get_all_conditions(self):
+        return self.all()
+
+    def get_condition_by_id(self, condition_id):
+        return self.get(id=condition_id)
+
+    def suggest_condition_to_user(self, user_id, condition_id):
+        try:
+            user = User.objects.get(pk=user_id)
+            condition = Condition.objects.get(pk=condition_id)
+
+            UserCondition.objects.create(User=user, Condition=condition)
+
+            return "Condition suggested to user successfully"
+        except User.DoesNotExist:
+            return "User not found"
+        except Condition.DoesNotExist:
+            return "Condition not found"
         except Exception as e:
             print(f"An error occurred: {str(e)}")
             return "An unexpected error occurred. Please try again or contact support."

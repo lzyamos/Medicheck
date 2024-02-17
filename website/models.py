@@ -1,4 +1,7 @@
 from django.db import models
+import logging
+
+logger = logging.getLogger(__name__)
 
 class User(models.Model):
     UserID = models.AutoField(primary_key=True)
@@ -13,18 +16,18 @@ class User(models.Model):
 
     def __str__(self):
         return self.Username
+
 class Record(models.Model):
-    RecordID = models.AutoField(primary_key=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    first_name = models.CharField(max_length=50)
-    last_name =  models.CharField(max_length=50)
-    email =  models.CharField(max_length=100)
-    phone = models.CharField(max_length=15, default="2457000000000")
-	
+    RecordID = models.CharField(primary_key=True, max_length=10, default="100001")
+    Created_at = models.DateTimeField(auto_now_add=True)
+    First_name = models.CharField(max_length=50)
+    Last_name = models.CharField(max_length=50)
+    Email = models.CharField(max_length=100)
+    Phone = models.CharField(max_length=15, default="2457000000000")
 
     def __str__(self):
-	    return(f"{self.first_name} {self.last_name}")
- 
+        return f"{self.First_name} {self.Last_name}"
+
 class Symptom(models.Model):
     SymptomID = models.AutoField(primary_key=True)
     SymptomName = models.CharField(max_length=100)
@@ -60,17 +63,6 @@ class UserTestHistory(models.Model):
     TestName = models.CharField(max_length=100)
     TestDate = models.DateField()
     TestResult = models.CharField(max_length=100)
-    LabName = models.CharField(max_length=100)
-    DoctorName = models.CharField(max_length=100)
-    Notes = models.TextField()
-
-class UserConsultationHistory(models.Model):
-    ConsultationID = models.AutoField(primary_key=True)
-    UserID = models.ForeignKey(User, on_delete=models.CASCADE)
-    DoctorName = models.CharField(max_length=100)
-    ConsultationDate = models.DateTimeField(auto_now_add=True)
-    Diagnosis = models.TextField()
-    TreatmentPlan = models.TextField()
     Notes = models.TextField()
 
 class SymptomManager(models.Manager):
@@ -82,25 +74,27 @@ class SymptomManager(models.Manager):
 
     def record_user_symptom(self, UserId, SymptomId, Severity):
         try:
-            User = User.objects.get(pk=UserId)
-            Symptom = Symptom.objects.get(pk=SymptomId)
-            ExistingRecord = UserSymptom.objects.filter(User=User, Symptom=Symptom).first()
+            UserObj = User.objects.get(pk=UserId)
+            SymptomObj = Symptom.objects.get(pk=SymptomId)
+            ExistingRecord = UserSymptom.objects.filter(User=UserObj, Symptom=SymptomObj).first()
 
             if ExistingRecord:
                 ExistingRecord.Severity = Severity
                 ExistingRecord.save()
             else:
-                UserSymptom.objects.create(User=User, Symptom=Symptom, Severity=Severity)
+                UserSymptom.objects.create(User=UserObj, Symptom=SymptomObj, Severity=Severity)
 
             return "Symptom recorded successfully"
         except User.DoesNotExist:
+            logger.error("User not found")
             return "User not found"
         except Symptom.DoesNotExist:
+            logger.error("Symptom not found")
             return "Symptom not found"
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            logger.error(f"An error occurred: {str(e)}")
             return "An unexpected error occurred. Please try again or contact support."
-        
+
 class ConditionManager(models.Manager):
     def get_all_conditions(self):
         return self.all()
@@ -117,9 +111,11 @@ class ConditionManager(models.Manager):
 
             return "Condition suggested to user successfully"
         except User.DoesNotExist:
+            logger.error("User not found")
             return "User not found"
         except Condition.DoesNotExist:
+            logger.error("Condition not found")
             return "Condition not found"
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            logger.error(f"An error occurred: {str(e)}")
             return "An unexpected error occurred. Please try again or contact support."

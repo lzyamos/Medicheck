@@ -5,28 +5,25 @@ from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
+# Define the symptoms_data
 symptoms_data = [
-    {'Disease': 'Malaria', 'symptoms': ['Fever', 'Chills', 'Headache', 'Muscle_ache', 'Fatigue', 'Nausea', 'Vomiting', 'Diarrhea']},
-    {'Disease': 'Tuberculosis', 'symptoms': ['Cough', 'Weight_loss', 'Night_sweats', 'Fatigue', 'Chest_pain', 'Bloody_cough']},
-    {'Disease': 'HIV/AIDS', 'symptoms': ['Fatigue', 'Weight_loss', 'Fever', 'Night_sweat', 'Recurrent_infection']},
-    {'Disease': 'Gastroenteritis', 'symptoms': ['Diarrhea', 'Abdominal_pain', 'Cramps', 'Nausea', 'Vomiting']},
-    {'Disease': 'Typhoid', 'symptoms': ['High_fever', 'Headache', 'Abdominal_pain', 'Constipation', 'Diarrhea', 'Weakness']},
-    {'Disease': 'Cholera', 'symptoms': ['Water_diarrhea', 'Vomiting', 'Rapid_heart_rate', 'Dehydration', 'Muscle_cramps']},
-    {'Disease': 'Diabetes', 'symptoms': ['Frequent_urination', 'Excessive_thirst', 'Weight_loss', 'Fatigue', 'Blurred_vision']},
-    {'Disease': 'Hypertension', 'symptoms': ['High_blood_pressure', 'Headache', 'Dizziness', 'Chest_pain', 'Fatigue']},
-    {'Disease': 'Pneumonia', 'symptoms': ['Phlegm_cough', 'Chest_pain', 'Loss_of_breath', 'Fever', 'Fatigue']},
-    {'Disease': 'Dengue_Fever', 'symptoms': ['High_fever', 'Severe_headache', 'Pain_in_eyes', 'Joint_pain', 'Muscle_pain', 'Rash']}
+    {'Condition': 'Malaria', 'symptoms': ['Fever', 'Chills', 'Headache', 'Muscle_ache', 'Fatigue', 'Nausea', 'Vomiting', 'Diarrhea']},
+    {'Condition': 'Tuberculosis', 'symptoms': ['Cough', 'Weight_loss', 'Night_sweats', 'Fatigue', 'Chest_pain', 'Bloody_cough']},
+    {'Condition': 'HIV/AIDS', 'symptoms': ['Fatigue', 'Weight_loss', 'Fever', 'Night_sweat', 'Recurrent_infection']},
+    {'Condition': 'Gastroenteritis', 'symptoms': ['Diarrhea', 'Abdominal_pain', 'Cramps', 'Nausea', 'Vomiting']},
+    {'Condition': 'Typhoid', 'symptoms': ['High_fever', 'Headache', 'Abdominal_pain', 'Constipation', 'Diarrhea', 'Weakness']},
+    {'Condition': 'Cholera', 'symptoms': ['Water_diarrhea', 'Vomiting', 'Rapid_heart_rate', 'Dehydration', 'Muscle_cramps']},
+    {'Condition': 'Diabetes', 'symptoms': ['Frequent_urination', 'Excessive_thirst', 'Weight_loss', 'Fatigue', 'Blurred_vision']},
+    {'Condition': 'Hypertension', 'symptoms': ['High_blood_pressure', 'Headache', 'Dizziness', 'Chest_pain', 'Fatigue']},
+    {'Condition': 'Pneumonia', 'symptoms': ['Phlegm_cough', 'Chest_pain', 'Loss_of_breath', 'Fever', 'Fatigue']},
+    {'Condition': 'Dengue_Fever', 'symptoms': ['High_fever', 'Severe_headache', 'Pain_in_eyes', 'Joint_pain', 'Muscle_pain', 'Rash']}
 ]
 
 # Convert the data to a flat list of symptoms and corresponding labels
-flat_symptoms = []
-labels = []
+flat_symptoms = [' '.join(entry['symptoms']) for entry in symptoms_data]
+labels = [entry['Condition'] for entry in symptoms_data]
 
-for entry in symptoms_data:
-    flat_symptoms.append(' '.join(entry['symptoms']))
-    labels.append(entry['Disease'])
-
-# Use LabelEncoder to convert disease labels to numerical values
+# Use LabelEncoder to convert Condition labels to numerical values
 label_encoder = LabelEncoder()
 labels_encoded = label_encoder.fit_transform(labels)
 
@@ -35,7 +32,6 @@ flat_symptoms_train, flat_symptoms_test, labels_train, labels_test = train_test_
 
 # Combine training and test labels for label encoding
 all_labels = labels_train + labels_test
-
 label_encoder.fit(all_labels)
 
 # Simple Dataset class
@@ -101,4 +97,5 @@ with torch.no_grad():
 accuracy = correct / total
 print(f'Test Accuracy: {accuracy * 100:.2f}%')
 
+# Save the trained model
 torch.save(model.state_dict(), 'symptom_analyzer_model.pth')

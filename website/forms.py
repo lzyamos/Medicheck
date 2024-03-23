@@ -38,10 +38,19 @@ class AddRecordForm(forms.ModelForm):
 
 
 class SymptomAnalyzerForm(forms.Form):
-    symptom = forms.ChoiceField(choices=[], widget=forms.Select(attrs={'class': 'form-control'}), label="Select a Symptom")
-    severity = forms.IntegerField(min_value=1, max_value=10, widget=forms.NumberInput(attrs={'class': 'form-control'}), label="Severity")
+    symptoms = forms.MultipleChoiceField(
+        choices=[],  # Will be dynamically populated
+        widget=forms.SelectMultiple(attrs={'class': 'form-control', 'id': 'symptoms-select'}),
+        label="Select or Type Symptoms"
+    )
+    selected_symptoms = forms.MultipleChoiceField(
+        choices=[],  # Will be dynamically populated
+        widget=forms.SelectMultiple(attrs={'class': 'form-control', 'id': 'selected-symptoms'}),
+        label="Selected Symptoms"
+    )
 
     def __init__(self, *args, **kwargs):
         symptoms_choices = kwargs.pop('symptoms_choices', [])
         super(SymptomAnalyzerForm, self).__init__(*args, **kwargs)
-        self.fields['symptom'].choices = symptoms_choices
+        self.fields['symptoms'].choices = symptoms_choices
+        self.fields['selected_symptoms'].choices = symptoms_choices

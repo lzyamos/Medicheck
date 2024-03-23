@@ -10,27 +10,35 @@
       <h2>Symptom Analyzer</h2>
       <form method="POST" action="{% url 'symptom_analyzer' %}">
         {% csrf_token %}
-        {{ symptom_form }}
+
         <div class="mb-3">
-          <label for="severity" class="form-label">Severity:</label>
-          {{ symptom_form.severity }}
+          <label for="symptoms" class="form-label">Symptoms:</label>
+          {{ symptom_form.symptoms }}
         </div>
-        <button type="submit" class="btn btn-primary">Analyze</button>
+        <div class="mb-3">
+          <label for="selected_symptoms" class="form-label">Selected Symptoms:</label>
+          {{ symptom_form.selected_symptoms }}
+        </div>
+        <button type="submit" class="btn btn-dark">Analyze</button>
       </form>
     </div>
-  
+    
     {% else %}
-      <h1>Login</h1>
-      <form method='POST' action="{% url 'home' %}">
-        {% csrf_token %}
-        <div class="mb-3">
-          <input type="text" class="form-control" name="username" placeholder="Username" required>
-        </div>
-        <div class="mb-3">
-          <input type="password" class="form-control" name="password" placeholder="Password" required>
-        </div>
-        <button type="submit" class="btn btn-secondary">Login</button>
-      </form>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <h1 class="text-center">Login</h1>
+        <form method='POST' action="{% url 'home' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" class="form-control" name="username" placeholder="Username" required>
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" name="password" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn-secondary">Login</button>
+        </form>
+      </div>
+    </div>
     {% endif %}
   </div>
 
@@ -38,3 +46,13 @@
 </div>
 
 {% endblock %}
+
+<script>
+  $(document).ready(function() {
+    $('#symptoms-select').select2({
+      placeholder: 'Select or Type Symptoms',
+      allowClear: true,
+      tags: true,
+    });
+  });
+</script>
